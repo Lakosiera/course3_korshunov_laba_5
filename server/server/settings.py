@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "laba_5.apps.Laba5Config", # модуль для Лаба №4
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

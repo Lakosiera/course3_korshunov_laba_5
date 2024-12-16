@@ -1,0 +1,11 @@
+.my-icon {
+    background-image: url("/static/favicon.svg");
+    background-size:100% 100%;
+    background-repeat: no-repeat;
+    min-height: 32px;
+    min-width: 32px;
+}
+
+.my-message p, .my-message ul {
+    margin-bottom: 0 !important;
+}
