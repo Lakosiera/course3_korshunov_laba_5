@@ -38,17 +38,22 @@
                 <!-- Имена вкладок -->
                 <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link {% if tab_index == "0" %} active {% endif %}" id="input-tab" data-bs-toggle="tab" data-bs-target="#input-tab-pane" type="button" role="tab" aria-controls="input-tab-pane" aria-selected="{% if tab_index == "0" %} true {% else %} false {% endif %}">
+                    <button class="nav-link {% if tab_index == "0" %} active {% endif %}" id="albums-tab" data-bs-toggle="tab" data-bs-target="#albums-tab-pane" type="button" role="tab" aria-controls="albums-tab-pane" aria-selected="{% if tab_index == "0" %} true {% else %} false {% endif %}">
+                      Альбомы
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if tab_index == "1" %} active {% endif %}" id="input-tab" data-bs-toggle="tab" data-bs-target="#input-tab-pane" type="button" role="tab" aria-controls="input-tab-pane" aria-selected="{% if tab_index == "1" %} true {% else %} false {% endif %}">
                       Добавить
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link {% if tab_index == "1" %} active {% endif %}" id="import-tab" data-bs-toggle="tab" data-bs-target="#import-tab-pane" type="button" role="tab" aria-controls="import-tab-pane" aria-selected="{% if tab_index == "1" %} true {% else %} false {% endif %}">
+                    <button class="nav-link {% if tab_index == "2" %} active {% endif %}" id="import-tab" data-bs-toggle="tab" data-bs-target="#import-tab-pane" type="button" role="tab" aria-controls="import-tab-pane" aria-selected="{% if tab_index == "2" %} true {% else %} false {% endif %}">
                       Импорт
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link {% if tab_index == "2" %} active {% endif %}" id="export-tab" data-bs-toggle="tab" data-bs-target="#export-tab-pane" type="button" role="tab" aria-controls="export-tab-pane" aria-selected="{% if tab_index == "2" %} true {% else %} false {% endif %}">
+                    <button class="nav-link {% if tab_index == "3" %} active {% endif %}" id="export-tab" data-bs-toggle="tab" data-bs-target="#export-tab-pane" type="button" role="tab" aria-controls="export-tab-pane" aria-selected="{% if tab_index == "3" %} true {% else %} false {% endif %}">
                       Экспорт
                     </button>
                   </li>
@@ -60,8 +65,23 @@
                 <!-- Содержание вкладок -->
                 <div class="tab-content" id="myTabContent">
 
+                  <!-- Вкладка Альбомы -->
+                  <div class="tab-pane fade {% if tab_index == "0" %} show active {% endif %}" id="albums-tab-pane" role="tabpanel" aria-labelledby="albums-tab" tabindex="0">
+                    <div class="row g-3">
+                      <!-- Записывать ли в базу данных -->
+                      <div class="col-12">
+                        <div class="input-group">
+                          <div class="form-check form-switch my-auto">
+                            <input checked value="" name="to_db" class="form-check-input" type="checkbox" role="switch" id="showFromDb">
+                            <label class="form-check-label" for="showFromDb">Из Базы Данных</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <!-- Вкладка Создать -->
-                  <div class="tab-pane fade {% if tab_index == "0" %} show active {% endif %}" id="input-tab-pane" role="tabpanel" aria-labelledby="input-tab" tabindex="0">
+                  <div class="tab-pane fade {% if tab_index == "1" %} show active {% endif %}" id="input-tab-pane" role="tabpanel" aria-labelledby="input-tab" tabindex="1">
                     <!-- Форма для создания альбома -->
                     <!-- метод загрузки формы 'create' из "urls.py" -->
                     <form class="needs-validation" action="{% url 'create' %}" method="post">
@@ -124,7 +144,7 @@
                           <div class="input-group">
                             <div class="form-check form-switch my-auto">
                               <input name="to_db" class="form-check-input" type="checkbox" role="switch" id="addToDb">
-                              <label class="form-check-label" for="addToDb">Добавить в Базу Данных</label>
+                              <label class="form-check-label" for="addToDb">В Базу Данных</label>
                             </div>
                           </div>
                         </div>
@@ -138,7 +158,7 @@
                   </div>
 
                   <!-- Вкладка Импорт -->
-                  <div class="tab-pane fade {% if tab_index == "1" %} show active {% endif %}" id="import-tab-pane" role="tabpanel" aria-labelledby="import-tab" tabindex="0">
+                  <div class="tab-pane fade {% if tab_index == "2" %} show active {% endif %}" id="import-tab-pane" role="tabpanel" aria-labelledby="import-tab" tabindex="2">
                     <!-- Форма для импорта файла -->
                     <!-- метод загрузки формы 'upload' из "urls.py" -->
                     <!-- обязательно метод "post" -->
@@ -168,7 +188,7 @@
                           <div class="input-group">
                             <div class="form-check form-switch">
                               <input name="to_db" class="form-check-input" type="checkbox" role="switch" id="importToDb">
-                              <label class="form-check-label" for="importToDb">Импортировать в Базу Данных</label>
+                              <label class="form-check-label" for="importToDb">В Базу Данных</label>
                             </div>
                           </div>
                         </div>
@@ -182,7 +202,7 @@
                   </div>
 
                   <!-- Вкладка Экспорт -->
-                  <div class="tab-pane fade {% if tab_index == "2" %} show active {% endif %}" id="export-tab-pane" role="tabpanel" aria-labelledby="export-tab" tabindex="0">
+                  <div class="tab-pane fade {% if tab_index == "3" %} show active {% endif %}" id="export-tab-pane" role="tabpanel" aria-labelledby="export-tab" tabindex="3">
                     <ul class="list-group mb-3">
                       <!-- Если есть список файлов -->
                       {% if files %}
