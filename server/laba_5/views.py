@@ -1,9 +1,8 @@
 from django.shortcuts import render, reverse
-from django.http import HttpResponse, HttpResponseRedirect, FileResponse
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse, Http404
 from django.contrib import messages
 import json
 from .forms import MusicAlbumForm, ImportFileForm
-from .file_utils import write_json, write_file, read_file, read_dir, delete_file
 
 # имя куки для хранения номера вкладки
 COOKIE_ACTIVE_TAB = "laba_5_tab"
@@ -17,17 +16,12 @@ def hello_world(request):
 
 # вьбшка главной страници
 def index(request):
-    # читаем список всех файло бля отображения во вкладке экспорт
-    # files = read_dir() # TODO
-    files = []
     # получаем из куки на какой вкладке мы были
     tab_index = request.COOKIES.get(COOKIE_ACTIVE_TAB, "0")
     # передаем данные контекста
     context = {
         # параметр заголовока
         "name": "Laba 5 - Музыкальные альбомы",
-        # список файлов
-        "files": files,
         # интекс вкладки
         "tab_index": tab_index,
     }
@@ -45,13 +39,11 @@ def create(request):
 
         # проверяем что форма верна
         if form.is_valid():
-            # вытаскиваем поле "title" из запроса
-            filename = request.POST["filename"]
-
             # обработка ошибок что могут возникнуть при записи
             try:
                 # записываем json на диск
-                write_json(filename, form.cleaned_data)
+                # TODO write_json
+                # write_json(filename, form.cleaned_data)
 
                 # отправляем сообщение что файл импортирован
                 messages.success(request, "Создание завершен успешно")
@@ -94,12 +86,6 @@ def import_file(request):
         if form.is_valid():
             # вытаскиваем данные файла из формы
             file = form.cleaned_data["file"]
-            # вытаскиваем поле "title" из формы
-            filename = form.cleaned_data["filename"]
-            # если поле "title" не задано
-            if not filename:
-                # имя фала остаеться изначальным
-                filename = file.name
 
             # обработка ошибок что могут возникнуть при работе с файлами
             try:
@@ -129,7 +115,8 @@ def import_file(request):
                 # если файл прошел валидацию
                 if file_is_valid:
                     # записываем файл на диск
-                    write_file(filename, file)
+                    # TODO 
+                    # write_file(filename, file)
 
                     # отправляем сообщение что файл импортирован
                     messages.success(request, "Импорт завершен успешно")
@@ -160,30 +147,14 @@ def import_file(request):
     return response
 
 
-# вьбшка для скачивания файла
+# вьюшка для скачивания файла
 # нет своей страницы, просто качает файл
-def download_file(request, filename):
+def export(request):
+    # TODO 
     # создаем ответ с данными файла
-    response = FileResponse(read_file(filename))
-    # устанавливаем тип ответа "octet-stream" чтобы браузер качал файл а не открыл как страницу
-    response["Content-Type"] = "application/octet-stream"
-    # устанавливаем имя файла
-    response["Content-Disposition"] = f'attachment; filename="{filename}"'
-    return response
-
-
-# вьбшка для удаления файла
-# нет свое страницы, просто редирект на главную
-def delete(request, filename):
-    # удалям файл
-    delete_file(filename)
-    # создаем редирект
-    response = HttpResponseRedirect(  # создаем редирект
-        reverse(
-            # имя редиреакта из "urls.py"
-            "index"
-        )
-    )
-    # устанавливаем в куки что это третья вкладка
-    response.set_cookie(COOKIE_ACTIVE_TAB, 2)
+    response = Http404() # FileResponse(read_file(filename))
+    # # устанавливаем тип ответа "octet-stream" чтобы браузер качал файл а не открыл как страницу
+    # response["Content-Type"] = "application/octet-stream"
+    # # устанавливаем имя файла
+    # response["Content-Disposition"] = f'attachment; filename="{"filename"}"'
     return response
