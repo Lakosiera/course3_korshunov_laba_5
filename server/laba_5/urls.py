@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views
 
-# пути для модуля 'laba_4'
+# пути для модуля 'laba_5'
 urlpatterns = [
     # корневой путь (т.е. "/" или "http://localhost:8004/")
     path(
