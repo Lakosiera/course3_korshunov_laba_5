@@ -76,8 +76,13 @@ WSGI_APPLICATION = 'server.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # Настройка доступа к базе данных
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST" : "laba-5-db", # имя берется из docker compose в поле контенера container_name
+        "PORT": 5432,
+        "NAME": "laba_5",
+        "USER": "django",
+        "PASSWORD": "django",
     }
 }
 

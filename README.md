@@ -16,6 +16,57 @@
 
 > *7.* Информация о музыкальных альбомах JSON.
 
+## Первичная Настрока базы данных для Django
+
+> Выполнять **после** запуска Docker контейнера 
+
+[Инструкция по миграции](server/МОГРАЦИЯ.md)
+
+## Docker
+
+### Сборка Docker образа из Dockerfile
+
+```sh
+docker compose build
+```
+
+### Запуск Docker композа
+
+```sh
+# будет выводит информацию в консоль
+docker compose up
+```
+
+или
+
+```sh
+# запустит контенер без консоли
+docker compose up -d
+```
+
+### Остановка Docker композа
+
+```sh
+# остановит контенер
+docker compose down
+```
+
+### Зайти в оболочку контейнера
+
+```sh
+# зайти в комендную обалочку контенера
+docker exec -it container_name sh
+# docker exec -it laba-5-django sh
+```
+
+или
+
+```sh
+# зайти в комендную обалочку контенера через композ
+docker compose exec service_name sh
+# docker compose exec laba-5-django sh
+```
+
 ## Настрока Django без Docker
 
 ### Настрока Питона
@@ -52,55 +103,7 @@ cd server
 python manage.py runserver
 ```
 
-### Запуск Докера композа
-
-```sh
-docker compose up
-```
-
-### Зайти в оболочку контейнера
-
-```sh
-docker exec -it container_name sh
-# docker exec -it django-db sh
-```
-
-или
-
-```sh
-docker compose exec service_name sh
-# docker compose exec db sh
-```
-
 ### Джанго проверка
 
 [http://127.0.0.1:8005/](http://127.0.0.1:8005/)
 
-## Postgrs
-
-```sh
-su - postgres -c psql
-```
-
-Создание пользователя и таблицы
-
-```sql
-CREATE USER django WITH PASSWORD 'django';  
-CREATE DATABASE laba3;
-GRANT ALL ON DATABASE laba3 TO django;
-ALTER DATABASE laba3 OWNER TO django;
-```
-
-### Django
-
-Миграция для админки
-
-```sh
-python manage.py migrate
-```
-
-Создаение суперпользователя
-
-```sh
-python manage.py createsuperuser
-```
