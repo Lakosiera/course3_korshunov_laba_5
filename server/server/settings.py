@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'server.wsgi.application'
 DATABASES = {
     'default': {
         # Настройка доступа к базе данных
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "django.db.backends.postgresql", # драйвер Django
         "HOST" : "laba-5-db", # имя берется из docker compose в поле контенера container_name
         "PORT": 5432,
-        "NAME": "laba_5",
+        "NAME": "laba_5", # имя базы данных
         "USER": "django",
         "PASSWORD": "django",
     }

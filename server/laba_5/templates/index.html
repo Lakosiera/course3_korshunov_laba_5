@@ -59,15 +59,23 @@
               <div class="card-body">
                 <!-- Содержание вкладок -->
                 <div class="tab-content" id="myTabContent">
-                  <!-- Вкладка Добавить -->
+                  <!-- Вкладка Создать -->
                   <div class="tab-pane fade {% if tab_index == "0" %} show active {% endif %}" id="input-tab-pane" role="tabpanel" aria-labelledby="input-tab" tabindex="0">
-                    <!-- Форма для добаваления альбома -->
+                    <!-- Форма для создания альбома -->
                     <!-- метод загрузки формы 'create' из "urls.py" -->
                     <form class="needs-validation" action="{% url 'create' %}" method="post">
                       <!-- Говорим чтобы Django занялся безопасность запроса из формы (Cross Site Request Forgeries) -->
                       {% csrf_token %}
 
                       <div class="row g-3 mb-3">
+
+                        <div class="col-12">
+                          <div class="input-group">
+                            <span class="input-group-text" id="basic-addon1">Файл</span>
+                            <!--  -->
+                            <input required value="albums" name="filename" class="form-control" type="text" placeholder="Имя на сервере" aria-label="name input" />
+                          </div>
+                        </div>
 
                         <div class="col-md-6">
                           <!-- название альбома -->
@@ -129,6 +137,11 @@
                       {% csrf_token %}
 
                       <div class="mb-3">
+                        <!-- Необязательное поле с новым именем файла -->
+                        <input name="filename" class="form-control" type="text" placeholder="Имя файла на сервере" aria-label="file name input" />
+                      </div>
+
+                      <div class="mb-3">
                         <!-- Обязательное поле для загрузки файла -->
                         <input name="file" class="form-control" type="file" id="formFile" required />
                       </div>
@@ -142,8 +155,31 @@
 
                   <!-- Вкладка Экспорт -->
                   <div class="tab-pane fade {% if tab_index == "2" %} show active {% endif %}" id="export-tab-pane" role="tabpanel" aria-labelledby="export-tab" tabindex="0">
+                    <ul class="list-group mb-3">
+                      <!-- Если есть список файлов -->
+                      {% if files %}
+                        <!-- перебираем файлы -->
+                        {% for file in files %}
+                          <li class="list-group-item list-group-item-action px-2 d-flex justify-content-between align-items-start">
+                            <!-- выводим имя файла -->
+                            <div class="ms-2 pt-1 flex-fill text-start text-truncate">{{ file }}</div>
+                            <!-- действия над файлами -->
+                            <div class="btn-group" role="group" aria-label="file actions">
+                              <!-- скачать файл. ('download' из "urls.py") -->
+                              <a href="{% url 'download' file %}" class="btn btn-sm btn-dark" role="button">🔗</a>
+                              <!-- удалить файл. ('delete' из "urls.py") -->
+                              <a href="{% url 'delete' file %}" class="btn btn-sm btn-dark" role="button">❌</a>
+                            </div>
+                          </li>
+                        {% endfor %}
+                      {% else %}
+                        <!-- файлов нет, отображаем это на странице -->
+                        <li class="list-group-item list-group-item-warning">Файлов нет</li>
+                      {% endif %}
+                    </ul>
+
                     <div class="d-grid gap-2">
-                      <a href="{% url 'export' %}" class="btn btn-sm btn-primary" role="button">Экспорт</a>
+                      <a href="{% url 'export' %}" class="btn btn-sm btn-primary" role="button">Экспорт из базы</a>
                     </div>
                   </div>
                 </div>
