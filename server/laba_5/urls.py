@@ -12,7 +12,7 @@ urlpatterns = [
     ),
     path(
         route="create",  # путь
-        view=views.create,  # вьюшка из файла 'views.py'
+        view=views.add_album,  # вьюшка из файла 'views.py'
         name="create", 
     ),
     path(
@@ -32,7 +32,7 @@ urlpatterns = [
     ),
     path(
         route="export",  # путь  (т.е. /export")
-        view=views.export,  # вьюшка из файла 'views.py'
+        view=views.export_file,  # вьюшка из файла 'views.py'
         name="export", 
     ),
 ]

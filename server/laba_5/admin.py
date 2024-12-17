@@ -6,7 +6,7 @@ from .models import Album
 # класс обвертка над моделью 'Album' для работы в админке
 class AlbumAdmin(admin.ModelAdmin):
     # отображаем поля обьекта в админке
-    list_display = ('id', 'title', 'artist', 'relesased_at', 'length')
+    list_display = ('id', 'title', 'artist', 'relesased_at', 'tracks')
 
 
 # регистрируем классы моделей бля работы с ними в админке

@@ -2,7 +2,7 @@ from django.shortcuts import render, reverse
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.contrib import messages
 import json
-from .forms import MusicAlbumForm, ImportFileForm
+from .forms import AlbumForm, ImportFileForm, NewAlbumForm
 from .file_utils import write_json, write_file, read_file, read_dir, delete_file
 
 # имя куки для хранения номера вкладки
@@ -36,21 +36,35 @@ def index(request):
 
 # вьюшка для создания альбома
 # она не отображает свою страницу а перенаправляет на главную
-def create(request):
+def add_album(request):
     # проверяем что медод запроса "POST"
     if request.method == "POST":
         # получаем данные формы из запроса
-        form = MusicAlbumForm(request.POST)
+        album_form = AlbumForm(request.POST)
+        # получение полей для настройки
+        settings_form = NewAlbumForm(request.POST)
+        
+        # инициируем валидацию и очистку данных 
+        # без этого нельзя вытащить обработанные данные из .cleaned_data["имя_параметра"]
+        settings_form.full_clean()
 
         # проверяем что форма верна
-        if form.is_valid():
-            # вытаскиваем поле "title" из запроса
-            filename = request.POST["filename"]
+        if album_form.is_valid():
+            # вытаскиваем поле "filename"(имя файла на сервере) из формы настроек
+            filename = settings_form.cleaned_data["filename"]
+            # вытаскиваем поле "to_db"(сохранить в базу данных) из формы настроек 
+            # оно будет сразу нужного типа bool вместо строки
+            to_db = settings_form.cleaned_data["to_db"]
 
             # обработка ошибок что могут возникнуть при записи
             try:
-                # записываем json на диск
-                write_json(filename, form.cleaned_data)
+                # если в форме отмечено что нужно сохранить в базу данных
+                if to_db:
+                    # сохраняем новую запись в базу данных
+                    album_form.save()
+                else:
+                    # записываем json на диск
+                    write_json(filename, album_form.cleaned_data)
 
                 # отправляем сообщение что файл импортирован
                 messages.success(request, "Создание завершен успешно")
@@ -61,7 +75,7 @@ def create(request):
         else:
             # форма не верна, отправляем сообщение об ошибке
             messages.error(request, "Некоректные даннве из формы")
-            messages.error(request, f"{form.errors.as_ul()}")
+            messages.error(request, f"{album_form.errors.as_ul()}")
     else:
         # запрос был не "POST" отправляем сообщение с ошибкой
         messages.warning(request, "Неверный формат запроса")
@@ -74,7 +88,7 @@ def create(request):
         )
     )
     # устанавливаем в куки что это первая вкладка
-    response.set_cookie(COOKIE_ACTIVE_TAB, 0)
+    response.set_cookie(COOKIE_ACTIVE_TAB, 1)
     return response
 
 
@@ -114,7 +128,7 @@ def import_file(request):
                 # перебираем все элементы json массива
                 for json_item in json_data:
                     # конвертируем json данные ворму данных альбома
-                    albom = MusicAlbumForm(
+                    albom = AlbumForm(
                         data=json_item  # данные из словаря json
                     )
                     # проверяем данные на валидность
@@ -160,7 +174,7 @@ def import_file(request):
         )
     )
     # устанавливаем в куки что это вторая вкладка
-    response.set_cookie(COOKIE_ACTIVE_TAB, 1)
+    response.set_cookie(COOKIE_ACTIVE_TAB, 2)
     return response
 
 
@@ -189,11 +203,11 @@ def delete(request, filename):
         )
     )
     # устанавливаем в куки что это третья вкладка
-    response.set_cookie(COOKIE_ACTIVE_TAB, 2)
+    response.set_cookie(COOKIE_ACTIVE_TAB, 3)
     return response
 
 
-def export(request):
+def export_file(request):
     # создаем редирект
     response = HttpResponseRedirect(  # создаем редирект
         reverse(
@@ -202,5 +216,5 @@ def export(request):
         )
     )
     # устанавливаем в куки что это третья вкладка
-    response.set_cookie(COOKIE_ACTIVE_TAB, 2)
+    response.set_cookie(COOKIE_ACTIVE_TAB, 3)
     return response
