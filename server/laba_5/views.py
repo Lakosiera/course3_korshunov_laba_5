@@ -38,6 +38,8 @@ def index(request):
         "files": files,
         # интекс вкладки
         "tab_index": tab_index,
+        # все данные из базы данных
+        "albums": Album.objects.all(),
     }
     # ренедр вьюшки в html страницу
     return render(request, "index.html", context)

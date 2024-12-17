@@ -77,6 +77,36 @@
                           </div>
                         </div>
                       </div>
+
+                      <div class="col-12">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th scope="col">Название</th>
+                              <th scope="col">Артист</th>
+                              <th scope="col">Выпуска</th>
+                              <th scope="col">Треков</th>
+                              <th scope="col">Жанр</th>
+                              <th scope="col">Тип</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% if albums %}
+                              {% for album in albums %}
+                                <tr>
+                                  <td class="text-start">{{ album.title }}</td>
+                                  <td class="">{{ album.artist }}</td>
+                                  <td class="">{{ album.relesased_at | date:"SHORT_DATE_FORMAT" }}</td>
+                                  <td class="text-end">{{ album.tracks }}</td>
+                                  <td class="">{{ album.genre }}</td>
+                                  <td class="">{{ album.type }}</td>
+                                </tr>
+                              {% endfor %}
+                            {% endif %}
+                          </tbody>
+                        </table>
+
+                      </div>
                     </div>
                   </div>
 
