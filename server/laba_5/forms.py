@@ -12,6 +12,11 @@ class ImportFileForm(forms.Form):
     )
     # поле для бинарных данных файла
     file = forms.FileField()
+    # поле флаг (записывать ли в базу данных)
+    to_db = forms.BooleanField(
+        initial=False, # значение по умолчанию
+        required=False,  # необязательное поле
+    )
 
 
 class NewAlbumForm(forms.Form):

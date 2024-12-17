@@ -32,7 +32,7 @@ urlpatterns = [
     ),
     path(
         route="export",  # путь  (т.е. /export")
-        view=views.export_file,  # вьюшка из файла 'views.py'
+        view=views.export_file_from_db,  # вьюшка из файла 'views.py'
         name="export", 
     ),
 ]

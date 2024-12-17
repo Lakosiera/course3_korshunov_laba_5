@@ -2,8 +2,17 @@ from django.shortcuts import render, reverse
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.contrib import messages
 import json
+from datetime import datetime
+from .models import Album
 from .forms import AlbumForm, ImportFileForm, NewAlbumForm
-from .file_utils import write_json, write_file, read_file, read_dir, delete_file
+from .file_utils import (
+    write_json,
+    write_file,
+    read_file,
+    read_dir,
+    delete_file,
+    custom_json_serial,
+)
 
 # имя куки для хранения номера вкладки
 COOKIE_ACTIVE_TAB = "laba_5_tab"
@@ -43,8 +52,8 @@ def add_album(request):
         album_form = AlbumForm(request.POST)
         # получение полей для настройки
         settings_form = NewAlbumForm(request.POST)
-        
-        # инициируем валидацию и очистку данных 
+
+        # инициируем валидацию и очистку данных
         # без этого нельзя вытащить обработанные данные из .cleaned_data["имя_параметра"]
         settings_form.full_clean()
 
@@ -52,7 +61,7 @@ def add_album(request):
         if album_form.is_valid():
             # вытаскиваем поле "filename"(имя файла на сервере) из формы настроек
             filename = settings_form.cleaned_data["filename"]
-            # вытаскиваем поле "to_db"(сохранить в базу данных) из формы настроек 
+            # вытаскиваем поле "to_db"(сохранить в базу данных) из формы настроек
             # оно будет сразу нужного типа bool вместо строки
             to_db = settings_form.cleaned_data["to_db"]
 
@@ -98,61 +107,35 @@ def import_file(request):
     # проверяем что медод запроса "POST"
     if request.method == "POST":
         # получаем данные формы из запроса
-        form = ImportFileForm(
+        import_settings_form = ImportFileForm(
             data=request.POST,  # данные из формы
             files=request.FILES,  # файлы из формы
         )
 
         # проверяем что форма верна
-        if form.is_valid():
+        if import_settings_form.is_valid():
             # вытаскиваем данные файла из формы
-            file = form.cleaned_data["file"]
-            # вытаскиваем поле "title" из формы
-            filename = form.cleaned_data["filename"]
-            # если поле "title" не задано
-            if not filename:
-                # имя фала остаеться изначальным
-                filename = file.name
+            file = import_settings_form.cleaned_data["file"]
+            # вытаскиваем поле "filename" из формы
+            filename = import_settings_form.cleaned_data["filename"]
+            # вытаскиваем поле "to_db"(сохранить в базу данных) из формы настроек
+            # оно будет сразу нужного типа bool вместо строки
+            to_db = import_settings_form.cleaned_data["to_db"]
 
             # обработка ошибок что могут возникнуть при работе с файлами
             try:
-                # переменная для валидации файла
-                file_is_valid = True
                 # загружаем файл как json данные (на самомо деле в python то просто словарь ключ-значение)
                 json_data = json.load(file)
 
+                # проверяем что это json список а не объект
                 if not isinstance(json_data, list):
-                    file_is_valid = False
                     messages.error(request, "JSON не содержит массив Альбомов")
-
-                # перебираем все элементы json массива
-                for json_item in json_data:
-                    # конвертируем json данные ворму данных альбома
-                    albom = AlbumForm(
-                        data=json_item  # данные из словаря json
-                    )
-                    # проверяем данные на валидность
-                    if not albom.is_valid():
-                        # ставим флаг что данныве невалидны
-                        file_is_valid = False
-                        # выводим сообщение
-                        messages.error(request, f"{albom.errors.as_ul()}")
-                        messages.error(
-                            request,
-                            f"{json.dumps(json_item, indent = 4, ensure_ascii=False)}",
-                        )
-
-                # если файл прошел валидацию
-                if file_is_valid:
-                    # записываем файл на диск
-                    write_file(filename, file)
-
-                    # отправляем сообщение что файл импортирован
-                    messages.success(request, "Импорт завершен успешно")
                 else:
-                    # если файл непрошел валидацию
-                    # запрос был не "POST" отправляем сообщение с ошибкой
-                    messages.error(request, "Импорт неудался")
+                    if to_db:
+                        import_file_to_db(request, json_data)
+                    else:
+                        import_file_to_server(request, json_data, filename, file)
+
             except Exception as e:
                 # выводим сообщение об ошибке
                 messages.error(request, f"{e}")
@@ -160,7 +143,8 @@ def import_file(request):
         else:
             # форма не верна, отправляем сообщение об ошибке
             messages.error(
-                request, f"Некоректные даннве из формы\n{form.errors.as_text()}"
+                request,
+                f"Некоректные даннве из формы\n{import_settings_form.errors.as_text()}",
             )
     else:
         # запрос был не "POST" отправляем сообщение с ошибкой
@@ -176,6 +160,69 @@ def import_file(request):
     # устанавливаем в куки что это вторая вкладка
     response.set_cookie(COOKIE_ACTIVE_TAB, 2)
     return response
+
+
+# импорт из json в базу данных
+def import_file_to_db(request, json_data):
+    # перебираем все элементы json массива
+    for json_item in json_data:
+        # конвертируем json данные в форму данных альбома
+        albom = AlbumForm(
+            data=json_item,  # данные из словаря json
+        )
+        # проверяем данные на валидность
+        if albom.is_valid():
+            # сохраняем
+            albom.save()
+            # отправляем сообщение что файл импортирован
+            messages.success(request, "Импорт завершен успешно")
+        else:
+            # выводим сообщение об ошибке
+            messages.error(request, f"{albom.errors.as_ul()}")
+            messages.error(
+                request,
+                f"{json.dumps(json_item, indent = 4, ensure_ascii=False)}",
+            )
+
+
+# импорт из json на файл сервера
+def import_file_to_server(request, json_data, filename, file):
+    # если поле "filename" не задано
+    if not filename:
+        # имя фала остаеться изначальным
+        filename = file.name
+
+    # переменная для валидации файла
+    file_is_valid = True
+
+    # перебираем все элементы json массива
+    for json_item in json_data:
+        # конвертируем json данные в форму данных альбома
+        albom = AlbumForm(
+            data=json_item,  # данные из словаря json
+        )
+
+        # проверяем данные на валидность
+        if not albom.is_valid():
+            # ставим флаг что данныве невалидны
+            file_is_valid = False
+            # выводим сообщение
+            messages.error(request, f"{albom.errors.as_ul()}")
+            messages.error(
+                request,
+                f"{json.dumps(json_item, indent = 4, ensure_ascii=False)}",
+            )
+
+    # если файл прошел валидацию
+    if file_is_valid:
+        # записываем файл на диск
+        write_file(filename, file)
+        # отправляем сообщение что файл импортирован
+        messages.success(request, "Импорт завершен успешно")
+    else:
+        # если файл непрошел валидацию
+        # запрос был не "POST" отправляем сообщение с ошибкой
+        messages.error(request, "Импорт неудался")
 
 
 # вьбшка для скачивания файла
@@ -207,14 +254,28 @@ def delete(request, filename):
     return response
 
 
-def export_file(request):
-    # создаем редирект
-    response = HttpResponseRedirect(  # создаем редирект
-        reverse(
-            # имя редиреакта из "urls.py"
-            "index"
-        )
+# экспорт из базы данных в json
+def export_file_from_db(request):
+    # получаю все записи из базы данных
+    all_albums = Album.objects.all()
+    json_data = json.dumps(
+        list(all_albums.values()),  # данные для сериализации в JSON
+        indent=4,  # отступ при форматировании JSON
+        ensure_ascii=False,  # для включении поддержки UTF (русский и другие языки)
+        default=custom_json_serial,  # метод вызываемы при сериализации полей не имеющий свой сериализатор
     )
+
+    # создаем ответ с данными файла
+    response = FileResponse(json_data)
+
+    # устанавливаем тип ответа "octet-stream" чтобы браузер качал файл а не открыл как страницу
+    response["Content-Type"] = "application/octet-stream"
+    # устанавливаем имя файла
+    response["Content-Disposition"] = (
+        # передаем имя файла в браузер
+        f'attachment; filename="albums-{datetime.now().isoformat()}.json"'
+    )
+
     # устанавливаем в куки что это третья вкладка
     response.set_cookie(COOKIE_ACTIVE_TAB, 3)
     return response
