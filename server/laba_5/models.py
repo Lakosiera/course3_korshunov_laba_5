@@ -10,18 +10,23 @@ from django.utils.translation import gettext_lazy as _
 class Album(models.Model):
     # название альбома
     title = models.CharField(
-        verbose_name="Название",  # название столбца в админке
+        unique=True,  # это поле уникально (дубликатов с таким же названием не будет)
+        verbose_name="Название",  # название столбца в админке и ошибках
         max_length=50,  # максимальная длина текста
         help_text="Название альбома",
+        error_messages={
+            # сообщение при ошибке когда добавяют уже существующее название альбома
+            "unique": "Это название альбома уже сужествует",
+        },
     )
     # дата выпуска
     relesased_at = models.DateField(
-        verbose_name="Дата выпуска",  # название столбца в админке
+        verbose_name="Дата выпуска",  # название столбца в админке и ошибках
         help_text="Дата выпуска альбома",
     )
     # количесво трэков
     tracks = models.IntegerField(
-        verbose_name="Кол-во треков",  # название столбца в админке
+        verbose_name="Кол-во треков",  # название столбца в админке и ошибках
         validators=[
             # валидатор занчения, в данном случае минимальнео занчение должно быть равно 1
             MinValueValidator(
@@ -34,21 +39,21 @@ class Album(models.Model):
     )
     # артист
     artist = models.CharField(
-        verbose_name="Артист",  # название столбца в админке
+        verbose_name="Артист",  # название столбца в админке и ошибках
         max_length=50,  # максимальная длина текста
         blank=True,  # поле может быть пустым
         help_text="Артист",
     )
     # жанр
     genre = models.CharField(
-        verbose_name="Жанр",  # название столбца в админке
+        verbose_name="Жанр",  # название столбца в админке и ошибках
         max_length=50,  # максимальная длина текста
         blank=True,  # поле может быть пустым
         help_text="Жанр",
     )
     # тип альбома (Studio / Live / Solo)
     type = models.CharField(
-        verbose_name="Тип альбома",  # название столбца в админке
+        verbose_name="Тип альбома",  # название столбца в админке и ошибках
         max_length=50,  # максимальная длина текста
         blank=True,  # поле может быть пустым
         help_text="Тип альбома Дэмо / Дебютный / Промо / и т.д.",
