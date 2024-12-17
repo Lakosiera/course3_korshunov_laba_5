@@ -5,8 +5,8 @@ from django import forms
 class ImportFileForm(forms.Form):
     # опциональное поле для нового имени файла
     filename = forms.CharField(
-        max_length=50, # максимальная длина текста
-        required=False, # необязательное поле
+        max_length=50,  # максимальная длина текста
+        required=False,  # необязательное поле
     )
     # поле для бинарных данных файла
     file = forms.FileField()
@@ -16,31 +16,30 @@ class ImportFileForm(forms.Form):
 class MusicAlbumForm(forms.Form):
     # название альбома
     title = forms.CharField(
-        max_length=50, # максимальная длина текста
-        required=True, # обязательное поле
+        max_length=50,  # максимальная длина текста
+        required=True,  # обязательное поле
     )
     # дата выпуска
-    relesased_at = forms.CharField(
-        max_length=50, # максимальная длина текста
-        required=True, # обязательное поле
+    relesased_at = forms.DateField(
+        required=True,  # обязательное поле
     )
     # количесво трэков
     length = forms.IntegerField(
-        min_value=1, # минимальное значение
-        required=True, # обязательное поле
+        min_value=1,  # минимальное значение
+        required=True,  # обязательное поле
     )
     # артист
     artist = forms.CharField(
-        max_length=50, # максимальная длина текста
-        required=False, # необязательное поле
+        max_length=50,  # максимальная длина текста
+        required=False,  # необязательное поле
     )
     # жанр
     genre = forms.CharField(
-        max_length=50, # максимальная длина текста
-        required=False, # необязательное поле
+        max_length=50,  # максимальная длина текста
+        required=False,  # необязательное поле
     )
     # тип альбома (Studio / Live / Solo)
     type = forms.CharField(
-        max_length=50, # максимальная длина текста
-        required=False, # необязательное поле
+        max_length=50,  # максимальная длина текста
+        required=False,  # необязательное поле
     )

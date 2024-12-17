@@ -16,18 +16,25 @@ class Album(models.Model):
         help_text="Название альбома",
     )
     # дата выпуска
-    relesased_at = models.DateTimeField()
+    relesased_at = models.DateField(
+        help_text="Дата выпуска альбома",
+    )
     # количесво трэков
-    length = models.IntegerField()
+    length = models.IntegerField(
+        help_text="Кол-во треков в альбоме",
+    )
     # артист
     artist = models.CharField(
         max_length=50,  # максимальная длина текста
+        help_text="Артист",
     )
     # жанр
     genre = models.CharField(
         max_length=50,  # максимальная длина текста
+        help_text="Жанр",
     )
     # тип альбома (Studio / Live / Solo)
     type = models.CharField(
         max_length=50,  # максимальная длина текста
+        help_text="Тип альбома Дэмо / Дебютный / Промо / и т.д.",
     )

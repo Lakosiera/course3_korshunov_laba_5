@@ -56,7 +56,7 @@ def create(request):
                 messages.success(request, "Создание завершен успешно")
             except Exception as e:
                 # ловим ошибки при записе
-                messages.error(request, f"ошибка при создании альбома{e}")
+                messages.error(request, f"ошибка при создании альбома {e}")
 
         else:
             # форма не верна, отправляем сообщение об ошибке
@@ -85,8 +85,8 @@ def import_file(request):
     if request.method == "POST":
         # получаем данные формы из запроса
         form = ImportFileForm(
-            data=request.POST, # данные из формы
-            files=request.FILES, # файлы из формы
+            data=request.POST,  # данные из формы
+            files=request.FILES,  # файлы из формы
         )
 
         # проверяем что форма верна
@@ -115,7 +115,7 @@ def import_file(request):
                 for json_item in json_data:
                     # конвертируем json данные ворму данных альбома
                     albom = MusicAlbumForm(
-                        data=json_item # данные из словаря json
+                        data=json_item  # данные из словаря json
                     )
                     # проверяем данные на валидность
                     if not albom.is_valid():
@@ -123,8 +123,11 @@ def import_file(request):
                         file_is_valid = False
                         # выводим сообщение
                         messages.error(request, f"{albom.errors.as_ul()}")
-                        messages.error(request, f"{json.dumps(json_item, indent = 4, ensure_ascii=False)}")
-                        
+                        messages.error(
+                            request,
+                            f"{json.dumps(json_item, indent = 4, ensure_ascii=False)}",
+                        )
+
                 # если файл прошел валидацию
                 if file_is_valid:
                     # записываем файл на диск
@@ -142,7 +145,9 @@ def import_file(request):
 
         else:
             # форма не верна, отправляем сообщение об ошибке
-            messages.error(request, f"Некоректные даннве из формы\n{form.errors.as_text()}")
+            messages.error(
+                request, f"Некоректные даннве из формы\n{form.errors.as_text()}"
+            )
     else:
         # запрос был не "POST" отправляем сообщение с ошибкой
         messages.error(request, "Неверный формат запроса")

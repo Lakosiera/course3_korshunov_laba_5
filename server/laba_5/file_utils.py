@@ -1,6 +1,6 @@
 from os import listdir, path, remove
 import json
-
+from datetime import date, datetime
 
 # директория для хранения медиафайлов
 STOTRAGE_FOLDER = "/storage"
@@ -12,7 +12,7 @@ def write_json(filename, data):
     # если файл уже существует
     if path.isfile(jsonfile):
         # читаем json файл (+ - запись в файл включена)
-        with open(jsonfile,'r+', encoding='utf8') as infile:
+        with open(jsonfile, "r+", encoding="utf8") as infile:
             # читам json из фала
             json_data = json.load(infile)
             # добавляем запись в массив
@@ -20,16 +20,28 @@ def write_json(filename, data):
             # перемещаемся в начало файла (чтбы переписать содержимое)
             infile.seek(0)
             # перезаписываем файл
-            json.dump(json_data, infile, indent = 4, ensure_ascii=False)
+            json.dump(
+                json_data,  # данные для сериализации в JSON
+                infile,  # файл для записи
+                indent=4,  # отступ при форматировании JSON
+                ensure_ascii=False,  # для включении поддержки UTF (русский и другие языки)
+                default=custom_json_serial,  # метод вызываемы при сериализации полей не имеющий свой сериализатор
+            )
     else:
         # если файла не существует создаем файл
-        with open(jsonfile, "w", encoding='utf8') as outfile:
+        with open(jsonfile, "w", encoding="utf8") as outfile:
             # создаем josn с пустым массивом
             json_data = json.loads("[]")
             # добавляем запись в массив
             json_data.append(data)
             # записываем json в файл (с ворматированием отступов 4 пробела)
-            json.dump(json_data, outfile, indent = 4, ensure_ascii=False)
+            json.dump(
+                json_data,  # данные для сериализации в JSON
+                outfile,  # файл для записи
+                indent=4,  # отступ при форматировании JSON
+                ensure_ascii=False,  # для включении поддержки UTF (русский и другие языки)
+                default=custom_json_serial,  # метод вызываемы при сериализации полей не имеющий свой сериализатор
+            )
 
 
 # метод для записи файла
@@ -38,14 +50,14 @@ def write_file(filename, file):
     with open(f"{STOTRAGE_FOLDER}/{filename}", "wb+") as destination:
         # для каждого "кусочка" (chunk) данных
         for chunk in file.chunks():
-            # записываем в 
+            # записываем в
             destination.write(chunk)
 
 
 # метод для чтения файла
 def read_file(filename):
     # открыть файл для "r" - чтения, "b" - как бинарный файл
-    return open(f"{STOTRAGE_FOLDER}/{filename}", 'rb')
+    return open(f"{STOTRAGE_FOLDER}/{filename}", "rb")
 
 
 # метод для удаления файла
@@ -69,4 +81,14 @@ def read_dir():
         result.append(filename)
     # возврвщвем результат
     return result
-    
+
+
+# метод кастомного json сериализатора объекта
+# у которого нет своего json сериализатора
+def custom_json_serial(obj):
+    # если объект являеться датой или датой-верменем
+    if isinstance(obj, (datetime, date)):
+        # выводим как стандартный ISO формат (для даты: 'YYYY-MM-DD')
+        return obj.isoformat()
+    # по умолчанию просто конвертируем с троку
+    raise str(obj)
