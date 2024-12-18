@@ -35,4 +35,9 @@ urlpatterns = [
         view=views.export_file_from_db,  # вьюшка из файла 'views.py'
         name="export", 
     ),
+    path(
+        route="action",  # путь  (т.е. /action")
+        view=views.action,  # вьюшка из файла 'views.py'
+        name="action", 
+    ),
 ]

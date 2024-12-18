@@ -1,10 +1,11 @@
+from curses.ascii import isspace
 from django.shortcuts import render, reverse
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.contrib import messages
 import json
 from datetime import datetime
 from .models import Album
-from .forms import AlbumForm, ImportFileForm, NewAlbumForm
+from .forms import ActionForm, AlbumForm, ImportFileForm, NewAlbumForm
 from .file_utils import (
     write_json,
     write_file,
@@ -280,4 +281,41 @@ def export_file_from_db(request):
 
     # устанавливаем в куки что это третья вкладка
     response.set_cookie(COOKIE_ACTIVE_TAB, 3)
+    return response
+
+
+def action(request):
+    # проверяем что медод запроса "POST"
+    if request.method == "POST":
+        # получаем данные формы из запроса
+        action_form = ActionForm(
+            data=request.POST,  # данные из формы
+        )
+
+        album = AlbumForm(
+            data=request.POST,  # данные из формы
+        )
+
+        # проверяем что форма верна
+        if album.is_valid() and action_form.is_valid:
+            action = action_form.cleaned_data["action"]
+            if action == "delete":
+                messages.info(request, f"Удалить")
+            else:
+                messages.info(request, f"Сохранить")
+        else:
+            if not str.isspace(action_form.errors.as_text()):
+                messages.error(request, f"{action_form.errors.as_text()}")
+            # отправляем сообщение об ошибке
+            messages.error(request, f"{album.errors.as_text()}")
+
+    # создаем редирект
+    response = HttpResponseRedirect(  # создаем редирект
+        reverse(
+            # имя редиреакта из "urls.py"
+            "index"
+        )
+    )
+    # устанавливаем в куки что это третья вкладка
+    response.set_cookie(COOKIE_ACTIVE_TAB, 0)
     return response

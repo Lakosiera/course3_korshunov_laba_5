@@ -32,6 +32,13 @@ class NewAlbumForm(forms.Form):
     )
 
 
+class ActionForm(forms.Form):
+    # поле для именем файла
+    action = forms.CharField(
+        required=True,  # обязательное поле
+    )
+
+
 # класс для формы данных музыкального альбома
 # наследование от ModelForm позволяет подключить модель для работы с базой данных
 class AlbumForm(ModelForm):
