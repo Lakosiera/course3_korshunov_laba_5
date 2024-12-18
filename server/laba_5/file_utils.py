@@ -90,5 +90,5 @@ def custom_json_serial(obj):
     if isinstance(obj, (datetime, date)):
         # выводим как стандартный ISO формат (для даты: 'YYYY-MM-DD')
         return obj.isoformat()
-    # по умолчанию просто конвертируем с троку
-    raise str(obj)
+    # по умолчанию вернем тип объекта
+    raise f"Немогу сериализовать тип {type(obj)}"

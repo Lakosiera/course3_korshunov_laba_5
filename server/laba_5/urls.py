@@ -40,4 +40,9 @@ urlpatterns = [
         view=views.action,  # вьюшка из файла 'views.py'
         name="action", 
     ),
+    path(
+        route="albums",  # путь  (т.е. /albums")
+        view=views.json_albums,  # вьюшка из файла 'views.py'
+        name="albums", 
+    ),
 ]

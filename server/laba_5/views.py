@@ -1,6 +1,6 @@
 from curses.ascii import isspace
 from django.shortcuts import render, reverse
-from django.http import HttpResponse, HttpResponseRedirect, FileResponse
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse, JsonResponse
 from django.contrib import messages
 import json
 from datetime import datetime
@@ -261,11 +261,8 @@ def delete(request, filename):
 def export_file_from_db(request):
     # получаю все записи из базы данных
     all_albums = Album.objects.all()
-    json_data = json.dumps(
+    json_data = to_json_data( # метод обвертка
         list(all_albums.values()),  # данные для сериализации в JSON
-        indent=4,  # отступ при форматировании JSON
-        ensure_ascii=False,  # для включении поддержки UTF (русский и другие языки)
-        default=custom_json_serial,  # метод вызываемы при сериализации полей не имеющий свой сериализатор
     )
 
     # создаем ответ с данными файла
@@ -284,6 +281,7 @@ def export_file_from_db(request):
     return response
 
 
+# метод редактирования или удаления экземпляра записи базы данных
 def action(request):
     # проверяем что медод запроса "POST"
     if request.method == "POST":
@@ -344,3 +342,36 @@ def action(request):
     # устанавливаем в куки что это третья вкладка
     response.set_cookie(COOKIE_ACTIVE_TAB, 0)
     return response
+
+
+# вывод из базы данных в json ответ
+def json_albums(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+
+            all_albums = Album.objects.all()
+            json_data = to_json_data( # метод обвертка
+                list(all_albums.values()),  # данные для сериализации в JSON
+            )
+            return HttpResponse(json_data, content_type='application/json')
+        except Exception as e:
+            response = {
+                'status': 'error',
+                'message': f'{e}'
+            }
+            return HttpResponse(response, content_type='application/json')
+
+    albums = Album.objects.all()
+    response = HttpResponse(to_json_data(list(albums.values())), content_type='application/json')
+    return response
+
+
+ # метод обвертка
+def to_json_data(data):
+    return json.dumps(
+        data,  # данные для сериализации в JSON
+        indent=4,  # отступ при форматировании JSON
+        ensure_ascii=False,  # для включении поддержки UTF (русский и другие языки)
+        default=custom_json_serial,  # метод вызываемы при сериализации полей не имеющий свой сериализатор
+    )
