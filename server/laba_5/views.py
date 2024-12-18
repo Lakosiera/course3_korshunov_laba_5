@@ -292,22 +292,47 @@ def action(request):
             data=request.POST,  # данные из формы
         )
 
-        album = AlbumForm(
-            data=request.POST,  # данные из формы
-        )
-
-        # проверяем что форма верна
-        if album.is_valid() and action_form.is_valid:
+        # валидируем данные из формы
+        if action_form.is_valid():
+            # получаем id альбома
+            id = action_form.cleaned_data["id"]
+            # получаем тип действия
             action = action_form.cleaned_data["action"]
-            if action == "delete":
-                messages.info(request, f"Удалить")
+
+            # получаем из базы данных запись с нужным id
+            album = Album.objects.get(id=id)
+            # связываем данные формы с записью из формы
+            # чтобы можно было обновлять значения
+            album_form = AlbumForm(
+                data=request.POST,  # данные из формы
+                instance=album, # экземпляр днных из быза данных
+            )
+
+            # проверяем что форма верна
+            if album_form.is_valid():
+                # проверем тип операции
+                if action == "delete":
+                    # если удаление
+                    # удаляем экземпляр данных из базы данных
+                    album.delete()
+                    # выводим сообщение об успехе
+                    messages.info(request, f'Альбом #{id} "{album.title}" удален')
+                elif action == "update":
+                    # если сохранение
+                    # сохраняем / обновляем экземпляр данных в базе данных
+                    album.save()
+                    # выводим сообщение об успехе
+                    messages.info(request, f'Альбом #{id} "{album.title}" изменен')
+                else:
+                    # если действие неизвесно
+                    # выводим сообщение об обшибке
+                    messages.error(request, f'Неизвесный тип операции "{action}"')
             else:
-                messages.info(request, f"Сохранить")
+                # выводим сообщение об обшибке если данный альбома невалидны
+                messages.error(request, f"{album_form.errors.as_text()}")
         else:
-            if not str.isspace(action_form.errors.as_text()):
-                messages.error(request, f"{action_form.errors.as_text()}")
-            # отправляем сообщение об ошибке
-            messages.error(request, f"{album.errors.as_text()}")
+            # выводим сообщение об обшибке если из формы не пришли нужные поля
+            messages.error(request, f"{action_form.errors.as_text()}")
 
     # создаем редирект
     response = HttpResponseRedirect(  # создаем редирект

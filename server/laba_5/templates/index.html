@@ -146,7 +146,7 @@
                                             <div class="col-md-12 d-none">
                                               <div class="input-group">
                                                 <span class="input-group-text">ID</span>
-                                                <input readonly disabled required value="{{album.id}}" name="id" class="form-control" type="text" placeholder="ID альбома" aria-label="id input" />
+                                                <input readonly required value="{{album.id}}" name="id" class="form-control" type="text" placeholder="ID альбома" aria-label="id input" />
                                               </div>
                                             </div>
 
@@ -203,17 +203,17 @@
                                               </div>
                                             </div>
                                                 
-                                            <!--  -->
+                                            <!-- Кнопка для передачи данных из формы с типом удаление "delete" -->
                                             <div class="col-md-6">
                                               <div class="d-grid gap-2">
-                                                <button name="action" type="submit" value="delete" class="btn btn-danger" data-bs-dismiss="modal">🗑️ Удалить</button>
+                                                <button name="action" value="delete" type="submit" class="btn btn-danger" data-bs-dismiss="modal">🗑️ Удалить</button>
                                               </div>
                                             </div>
                                                     
-                                            <!-- Кнопка для передачи данных из формы во вьюшку -->
+                                            <!-- Кнопка для передачи данных из формы с типом сохранить "update"  -->
                                             <div class="col-md-6">
                                               <div class="d-grid gap-2">
-                                                <button name="action" type="submit" value="update" class="btn btn-primary" data-bs-dismiss="modal">📝 Сохранить</button>
+                                                <button name="action" value="update" type="submit" class="btn btn-primary" data-bs-dismiss="modal">📝 Сохранить</button>
                                               </div>
                                             </div>
                                           </div>

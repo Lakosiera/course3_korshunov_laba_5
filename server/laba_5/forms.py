@@ -34,6 +34,10 @@ class NewAlbumForm(forms.Form):
 
 class ActionForm(forms.Form):
     # поле для именем файла
+    id = forms.IntegerField(
+        required=True,  # обязательное поле
+    )
+    # поле для именем файла
     action = forms.CharField(
         required=True,  # обязательное поле
     )
