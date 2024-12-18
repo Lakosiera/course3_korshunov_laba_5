@@ -78,18 +78,34 @@
                         </div>
                       </div>
 
-                      <div class="col-12">
-                        <table class="table">
+                      <div class="col-12 table-responsive">
+                        <table class="table table-sm table-hover align-middle mb-0">
                           <thead>
-                            <tr>
-                              <th scope="col">Название</th>
-                              <th scope="col">Артист</th>
-                              <th scope="col">Выпуска</th>
-                              <th scope="col">Треков</th>
-                              <th scope="col">Жанр</th>
-                              <th scope="col">Тип</th>
+                            <tr class="">
+                              <th scope="col">
+                                <input name="title" class="form-control form-control-sm p-1" type="text" placeholder="Название" autocomplete="off" />
+                              </th>
+                              <th scope="col">
+                                <input name="artist" class="form-control form-control-sm p-1" type="text" placeholder="Артист" autocomplete="off" />
+                              </th>
+                              <th scope="col">
+                                <input disabled name="relesased_at" class="form-control form-control-sm p-1" type="text" placeholder="Выпуск" autocomplete="off" />
+                              </th>
+                              <th scope="col">
+                                <input name="tracks" class="form-control form-control-sm p-1" type="text" placeholder="Трэки" autocomplete="off" />
+                              </th>
+                              <th scope="col">
+                                <input name="genre" class="form-control form-control-sm p-1" type="text" placeholder="Жанр" autocomplete="off" />
+                              </th>
+                              <th scope="col">
+                                <input name="type" class="form-control form-control-sm p-1" list="text" placeholder="Тип" autocomplete="off"/>
+                              </th>
+                              <th scope="col">
+                                <div class="mb-1">✨</div>
+                              </th>
                             </tr>
                           </thead>
+
                           <tbody>
                             {% if albums %}
                               {% for album in albums %}
@@ -98,14 +114,39 @@
                                   <td class="">{{ album.artist }}</td>
                                   <td class="">{{ album.relesased_at | date:"SHORT_DATE_FORMAT" }}</td>
                                   <td class="text-end">{{ album.tracks }}</td>
-                                  <td class="">{{ album.genre }}</td>
-                                  <td class="">{{ album.type }}</td>
+                                  <td class="text-truncate">{{ album.genre }}</td>
+                                  <td class="text-truncate">{{ album.type }}</td>
+                                  <td class="">
+                                    <div class="d-grid gap-0">
+                                      <button type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#modal-{{ album.id }}">
+                                        ✏️
+                                      </button>
+                                    </div>
+                                  </td>
                                 </tr>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="modal-{{ album.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                      <div class="modal-header p-1">
+                                        <h1 class="modal-title fs-5 ms-1" id="exampleModalLabel">Альбом #{{ album.id }}</h1>
+                                        <button type="button" class="btn-close me-0" data-bs-dismiss="modal" aria-label="Close"></button>
+                                      </div>
+                                      <div class="modal-body">
+                                        {{ album.id }}
+                                      </div>
+                                      <div class="modal-footer p-1">
+                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">🗑️ Удалить</button>
+                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">📝 Сохранить</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
                               {% endfor %}
                             {% endif %}
                           </tbody>
                         </table>
-
                       </div>
                     </div>
                   </div>
