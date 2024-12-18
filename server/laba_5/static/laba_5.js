@@ -8,8 +8,23 @@ function onInit() {
     const addToDb = document.getElementById("addToDb")
     const importToDb = document.getElementById("importToDb")
 
+    initSearch()
+
     showFromDb.onchange = (event) => {
         console.log(event.currentTarget.checked)
+    };
+}
+
+function initSearch() {
+    const searchTitle = document.getElementById("searchTitle")
+    const searchArtist = document.getElementById("searchArtist")
+    const searchTracks = document.getElementById("searchTracks")
+    const searchGenre = document.getElementById("searchGenre")
+    const searchType = document.getElementById("searchType")
+
+    
+    searchTitle.oninput  = (event) => {
+        console.log(event.currentTarget.value)
     };
 }
 
