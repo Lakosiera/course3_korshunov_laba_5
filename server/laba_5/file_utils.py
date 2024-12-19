@@ -43,6 +43,17 @@ def write_json(filename, data):
                 default=custom_json_serial,  # метод вызываемы при сериализации полей не имеющий свой сериализатор
             )
 
+# метод для чтения json файла
+def read_json(filename):
+    try:
+        # читаем файл (r - чтение)
+        with open(f"{STOTRAGE_FOLDER}/{filename}", "r", encoding="utf8") as file:
+            # читам json из фала
+            return json.load(file)
+    except Exception:
+        # в случае ошибки возвращаем пустой массив
+        return []
+
 
 # метод для записи файла
 def write_file(filename, file):
@@ -92,3 +103,13 @@ def custom_json_serial(obj):
         return obj.isoformat()
     # по умолчанию вернем тип объекта
     raise f"Немогу сериализовать тип {type(obj)}"
+
+ # метод обвертка
+def json_str(data):
+    # сериализует объект в json текстового формата
+    return json.dumps(
+        data,  # данные для сериализации в JSON
+        indent=4,  # отступ при форматировании JSON
+        ensure_ascii=False,  # для включении поддержки UTF (русский и другие языки)
+        default=custom_json_serial,  # метод вызываемы при сериализации полей не имеющий свой сериализатор
+    )

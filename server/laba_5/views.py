@@ -1,6 +1,6 @@
-from curses.ascii import isspace
+import string
 from django.shortcuts import render, reverse
-from django.http import HttpResponse, HttpResponseRedirect, FileResponse, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.contrib import messages
 import json
 from datetime import datetime
@@ -12,7 +12,8 @@ from .file_utils import (
     read_file,
     read_dir,
     delete_file,
-    custom_json_serial,
+    json_str,
+    read_json,
 )
 
 # имя куки для хранения номера вкладки
@@ -261,7 +262,7 @@ def delete(request, filename):
 def export_file_from_db(request):
     # получаю все записи из базы данных
     all_albums = Album.objects.all()
-    json_data = to_json_data( # метод обвертка
+    json_data = json_str(  # метод обвертка
         list(all_albums.values()),  # данные для сериализации в JSON
     )
 
@@ -303,7 +304,7 @@ def action(request):
             # чтобы можно было обновлять значения
             album_form = AlbumForm(
                 data=request.POST,  # данные из формы
-                instance=album, # экземпляр днных из быза данных
+                instance=album,  # экземпляр днных из быза данных
             )
 
             # проверяем что форма верна
@@ -346,32 +347,72 @@ def action(request):
 
 # вывод из базы данных в json ответ
 def json_albums(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
+            # вытаскиваем тело запроса и преобразуем его в json
             data = json.loads(request.body)
+            # достаем флаг fromDb(из БД) из json
+            from_db = data["fromDb"]
+            # если получаем данные из БД
+            if from_db:
+                # достааем все данные альбомов из БД
+                all_albums = Album.objects.all()
+                json_data = json_str(  # метод обвертка
+                    list(all_albums.values()),  # данные для сериализации в JSON
+                )
+                # возвращаем ответ
+                return HttpResponse(
+                    json_data, # даннве ответа
+                    content_type="application/json", # формат ответа (бля того чтобы браузер знал что это)
+                )
+            else:
+                # если получаем данные из файла
 
-            all_albums = Album.objects.all()
-            json_data = to_json_data( # метод обвертка
-                list(all_albums.values()),  # данные для сериализации в JSON
-            )
-            return HttpResponse(json_data, content_type='application/json')
+                # достаем имя файла
+                filename = data["filename"]
+
+                # если строка имени не пустое 
+                if not str.isspace(filename):
+                    # читаем json файл
+                    json_data = json_str(read_json(filename))
+                    # возвращаем ответ
+                    return HttpResponse(
+                        json_data, # даннве ответа
+                        content_type="application/json", # формат ответа (бля того чтобы браузер знал что это)
+                    )
+                else:
+                    # если имя файлы нету
+                    # создаем объект словарь с ошибкой
+                    error = {
+                        "messaage": "имя файла не предоставлено"
+                    }
+                    # возвращаем ответ с ошибкой
+                    return HttpResponse(
+                        json_str(error), # даннве ответа
+                        content_type="application/json", # формат ответа (бля того чтобы браузер знал что это)
+                        status=404, # код ответа (404-ненайдено)
+                    )
         except Exception as e:
-            response = {
-                'status': 'error',
-                'message': f'{e}'
+            # ловим хоть одну ошибку
+            # создаем объект словарь с ошибкой
+            error = {
+                "messaage": f"{e}"
             }
-            return HttpResponse(response, content_type='application/json')
+            # возвращаем ответ с ошибкой
+            return HttpResponse(
+                json_str(error), # даннве ответа
+                content_type="application/json", # формат ответа (бля того чтобы браузер знал что это)
+                status=500, # код ответа (500-внутренняя ошибка сервера)
+            )
+    
 
-    albums = Album.objects.all()
-    response = HttpResponse(to_json_data(list(albums.values())), content_type='application/json')
-    return response
-
-
- # метод обвертка
-def to_json_data(data):
-    return json.dumps(
-        data,  # данные для сериализации в JSON
-        indent=4,  # отступ при форматировании JSON
-        ensure_ascii=False,  # для включении поддержки UTF (русский и другие языки)
-        default=custom_json_serial,  # метод вызываемы при сериализации полей не имеющий свой сериализатор
+    # достааем все данные альбомов из БД
+    all_albums = Album.objects.all()
+    json_data = json_str(  # метод обвертка
+        list(all_albums.values()),  # данные для сериализации в JSON
+    )
+    # возвращаем ответ
+    return HttpResponse(
+        json_data, # даннве ответа
+        content_type="application/json", # формат ответа (бля того чтобы браузер знал что это)
     )
