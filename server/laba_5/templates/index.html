@@ -68,18 +68,31 @@
 
                   <!-- Вкладка Альбомы -->
                   <div class="tab-pane fade {% if tab_index == "0" %} show active {% endif %}" id="albums-tab-pane" role="tabpanel" aria-labelledby="albums-tab" tabindex="0">
-                    <div class="row g-3">
+                    <div class="row g-2">
                       <!-- Выводить из базы данных -->
-                      <div class="col-12">
+                      <div class="col-md-6">
                         <div class="input-group">
                           <div class="form-check form-switch my-auto">
                             <input id="showFromDb" name="to_db" class="form-check-input" type="checkbox" role="switch">
-                            <label id="viewFromDb" class="form-check-label user-select-none" for="showFromDb">Из Базы Данных</label>
+                            <label class="form-check-label user-select-none" for="showFromDb">Из Базы Данных</label>
                           </div>
                         </div>
                       </div>
 
-                      <input id="searchTitle" name="title" class="form-control form-control-sm p-1" type="text" placeholder="" autocomplete="off" />
+                      <div class="col-md-6">
+                        <div class="input-group">
+                          <span class="input-group-text" id="basic-addon2">Файл</span>
+                          <input id="filenameInput" class="form-control form-control-sm" type="text" placeholder="На сервере" autocomplete="off" />
+                        </div>
+                      </div>
+
+                      <div class="col-12">
+                        <div class="input-group">
+                          <span class="input-group-text" id="basic-addon2">Поиск</span>
+                          <input id="searchInput" class="form-control form-control-sm" type="text" placeholder="В базе данных" autocomplete="off" />
+                        </div>
+                      </div>
+
 
                       <!-- Вывод таблицы данных -->
                       <div class="col-12 table-responsive">
@@ -376,7 +389,7 @@
               </div>
            
               <!-- сообщения (об ошибках и другие) -->
-              <div class="my-message card-footer py-0">
+              <div id="errorMsg" class="my-message card-footer py-0">
                 {% if messages %}
                   <!-- перебираем сообщения -->
                   {% for message in messages %}

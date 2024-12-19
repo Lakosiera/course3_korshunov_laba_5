@@ -1,7 +1,7 @@
-import string
 from django.shortcuts import render, reverse
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.contrib import messages
+from django.db.models import Q
 import json
 from datetime import datetime
 from .models import Album
@@ -345,24 +345,43 @@ def action(request):
 
 # вывод из базы данных в json ответ
 def json_albums(request):
-    if request.method == "POST":
-        try:
+    try:
+        if request.method == "POST":
             # вытаскиваем тело запроса и преобразуем его в json
             data = json.loads(request.body)
             # достаем флаг fromDb(из БД) из json (по умолчанию False)
             from_db = data.get("fromDb", False)
+            # получаем строку поиска
+            search = data.get("search", "")
 
             # если получаем данные из БД
             if from_db:
-                # достааем все данные альбомов из БД
-                all_albums = Album.objects.all()
+                # все альбомы
+                all_albums = []
+                # если строка поиска не пуста
+                if search is not None and not str.isspace(search):
+                    # делаем запрос в базу данных 
+                    # с условием фистров
+                    all_albums = Album.objects.filter(
+                        # title может создержать строку (не чувствительную к регитсру)
+                        Q(title__icontains=search)
+                        # artist может создержать строку (не чувствительную к регитсру)
+                        | Q(artist__icontains=search)
+                        # genre может создержать строку (не чувствительную к регитсру)
+                        | Q(genre__icontains=search)
+                        # type может создержать строку (не чувствительную к регитсру)
+                        | Q(type__icontains=search)
+                    ).values()
+                else:
+                    # достааем все данные альбомов из БД
+                    all_albums = Album.objects.all().values()
                 json_data = json_str(  # метод обвертка
-                    list(all_albums.values()),  # данные для сериализации в JSON
+                    list(all_albums),  # данные для сериализации в JSON
                 )
                 # возвращаем ответ
                 return HttpResponse(
-                    json_data, # даннве ответа
-                    content_type="application/json", # формат ответа (бля того чтобы браузер знал что это)
+                    json_data,  # даннве ответа
+                    content_type="application/json",  # формат ответа (бля того чтобы браузер знал что это)
                 )
             else:
                 # если получаем данные из файла
@@ -370,49 +389,45 @@ def json_albums(request):
                 # достаем имя файла (по умолчанию "")
                 filename = data.get("filename", "")
 
-                # если строка имени не пустое 
+                # если строка имени не пустое
                 if not str.isspace(filename):
                     # читаем json файл
                     json_data = json_str(read_json(filename))
                     # возвращаем ответ
                     return HttpResponse(
-                        json_data, # даннве ответа
-                        content_type="application/json", # формат ответа (бля того чтобы браузер знал что это)
+                        json_data,  # даннве ответа
+                        content_type="application/json",  # формат ответа (бля того чтобы браузер знал что это)
                     )
                 else:
                     # если имя файлы нету
                     # создаем объект словарь с ошибкой
-                    error = {
-                        "messaage": "имя файла не предоставлено"
-                    }
+                    error = {"messaage": "имя файла не предоставлено"}
                     # возвращаем ответ с ошибкой
                     return HttpResponse(
-                        json_str(error), # даннве ответа
-                        content_type="application/json", # формат ответа (бля того чтобы браузер знал что это)
-                        status=404, # код ответа (404-ненайдено)
+                        json_str(error),  # даннве ответа
+                        content_type="application/json",  # формат ответа (бля того чтобы браузер знал что это)
+                        status=404,  # код ответа (404-ненайдено)
                     )
-        except Exception as e:
-            # ловим хоть одну ошибку
-            # создаем объект словарь с ошибкой
-            error = {
-                "messaage": f"error {e}"
-            }
-            # возвращаем ответ с ошибкой
-            return HttpResponse(
-                json_str(error), # даннве ответа
-                content_type="application/json", # формат ответа (бля того чтобы браузер знал что это)
-                status=500, # код ответа (500-внутренняя ошибка сервера)
+        else:
+            # достааем все данные альбомов из БД
+            all_albums = Album.objects.all()
+            json_data = json_str(  # метод обвертка
+                list(all_albums.values()),  # данные для сериализации в JSON
             )
-    
 
-    # достааем все данные альбомов из БД
-    all_albums = Album.objects.all()
-    json_data = json_str(  # метод обвертка
-        list(all_albums.values()),  # данные для сериализации в JSON
-    )
+            # возвращаем ответ
+            return HttpResponse(
+                json_data,  # даннве ответа
+                content_type="application/json",  # формат ответа (бля того чтобы браузер знал что это)
+            )
 
-    # возвращаем ответ
-    return HttpResponse(
-        json_data, # даннве ответа
-        content_type="application/json", # формат ответа (бля того чтобы браузер знал что это)
-    )
+    except Exception as e:
+        # ловим хоть одну ошибку
+        # создаем объект словарь с ошибкой
+        error = {"messaage": f"error {e}"}
+        # возвращаем ответ с ошибкой
+        return HttpResponse(
+            json_str(error),  # даннве ответа
+            content_type="application/json",  # формат ответа (бля того чтобы браузер знал что это)
+            status=500,  # код ответа (500-внутренняя ошибка сервера)
+        )
