@@ -39,22 +39,22 @@
                 <!-- Имена вкладок -->
                 <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link {% if tab_index == "0" %} active {% endif %}" id="albums-tab" data-bs-toggle="tab" data-bs-target="#albums-tab-pane" type="button" role="tab" aria-controls="albums-tab-pane" aria-selected="{% if tab_index == "0" %} true {% else %} false {% endif %}">
+                    <button onclick="setTab(0)" class="nav-link {% if tab_index == "0" %} active {% endif %}" id="albums-tab" data-bs-toggle="tab" data-bs-target="#albums-tab-pane" type="button" role="tab" aria-controls="albums-tab-pane" aria-selected="{% if tab_index == "0" %} true {% else %} false {% endif %}">
                       Альбомы
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link {% if tab_index == "1" %} active {% endif %}" id="input-tab" data-bs-toggle="tab" data-bs-target="#input-tab-pane" type="button" role="tab" aria-controls="input-tab-pane" aria-selected="{% if tab_index == "1" %} true {% else %} false {% endif %}">
+                    <button onclick="setTab(1)" class="nav-link {% if tab_index == "1" %} active {% endif %}" id="input-tab" data-bs-toggle="tab" data-bs-target="#input-tab-pane" type="button" role="tab" aria-controls="input-tab-pane" aria-selected="{% if tab_index == "1" %} true {% else %} false {% endif %}">
                       Добавить
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link {% if tab_index == "2" %} active {% endif %}" id="import-tab" data-bs-toggle="tab" data-bs-target="#import-tab-pane" type="button" role="tab" aria-controls="import-tab-pane" aria-selected="{% if tab_index == "2" %} true {% else %} false {% endif %}">
+                    <button onclick="setTab(2)" class="nav-link {% if tab_index == "2" %} active {% endif %}" id="import-tab" data-bs-toggle="tab" data-bs-target="#import-tab-pane" type="button" role="tab" aria-controls="import-tab-pane" aria-selected="{% if tab_index == "2" %} true {% else %} false {% endif %}">
                       Импорт
                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link {% if tab_index == "3" %} active {% endif %}" id="export-tab" data-bs-toggle="tab" data-bs-target="#export-tab-pane" type="button" role="tab" aria-controls="export-tab-pane" aria-selected="{% if tab_index == "3" %} true {% else %} false {% endif %}">
+                    <button onclick="setTab(3)" class="nav-link {% if tab_index == "3" %} active {% endif %}" id="export-tab" data-bs-toggle="tab" data-bs-target="#export-tab-pane" type="button" role="tab" aria-controls="export-tab-pane" aria-selected="{% if tab_index == "3" %} true {% else %} false {% endif %}">
                       Экспорт
                     </button>
                   </li>
@@ -73,161 +73,150 @@
                       <div class="col-12">
                         <div class="input-group">
                           <div class="form-check form-switch my-auto">
-                            <input checked value="" name="to_db" class="form-check-input" type="checkbox" role="switch" id="showFromDb">
+                            <input id="showFromDb" name="to_db" class="form-check-input" type="checkbox" role="switch">
                             <label id="viewFromDb" class="form-check-label user-select-none" for="showFromDb">Из Базы Данных</label>
                           </div>
                         </div>
                       </div>
+
+                      <input id="searchTitle" name="title" class="form-control form-control-sm p-1" type="text" placeholder="" autocomplete="off" />
 
                       <!-- Вывод таблицы данных -->
                       <div class="col-12 table-responsive">
                         <table class="table table-sm table-hover align-middle mb-0">
                           <thead>
                             <tr class="">
-                              <th scope="col">
-                                <input id="searchTitle" name="title" class="form-control form-control-sm p-1" type="text" placeholder="Название" autocomplete="off" />
-                              </th>
-                              <th scope="col">
-                                <input id="searchArtist" name="artist" class="form-control form-control-sm p-1" type="text" placeholder="Артист" autocomplete="off" />
-                              </th>
-                              <th scope="col">
-                                <input disabled id="searchRelesasedAt" name="relesased_at" class="form-control form-control-sm p-1" type="text" placeholder="Выпуск" autocomplete="off" />
-                              </th>
-                              <th scope="col">
-                                <input id="searchTracks" name="tracks" class="form-control form-control-sm p-1" type="text" placeholder="Трэки" autocomplete="off" />
-                              </th>
-                              <th scope="col">
-                                <input id="searchGenre" name="genre" class="form-control form-control-sm p-1" type="text" placeholder="Жанр" autocomplete="off" />
-                              </th>
-                              <th scope="col">
-                                <input id="searchType" name="type" class="form-control form-control-sm p-1" list="text" placeholder="Тип" autocomplete="off"/>
-                              </th>
-                              <th scope="col">
-                                <div class="mb-1">✨</div>
-                              </th>
+                              <th scope="col">Название</th>
+                              <th scope="col">Артист</th>
+                              <th scope="col">Выпуск</th>
+                              <th scope="col">Трэки</th>
+                              <th scope="col">Жанр</th>
+                              <th scope="col">Тип</th>
+                              <th scope="col">✨</th>
                             </tr>
                           </thead>
 
-                          <tbody>
-                            {% if albums %}
-                              {% for album in albums %}
-                                <tr>
-                                  <td class="text-start">{{ album.title }}</td>
-                                  <td class="">{{ album.artist }}</td>
-                                  <td class="">{{ album.relesased_at | date:"SHORT_DATE_FORMAT" }}</td>
-                                  <td class="text-end">{{ album.tracks }}</td>
-                                  <td class="text-truncate">{{ album.genre }}</td>
-                                  <td class="text-truncate">{{ album.type }}</td>
-                                  <td class="">
-                                    <div class="d-grid gap-0">
-                                      <button type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#modal-{{ album.id }}">
-                                        ✏️
-                                      </button>
+                          <tbody id="dataTableContainer">
+                            <!-- Таблица бцдет заполнена данными через javascript используя шаблон tmplDataTableRow -->
+                          </tbody>
+                        </table>                     
+
+                        <!-- шаблон бля заполнения таблицы -->
+                        <template id="tmplDataTableRow" class="d-none">
+                          <tr>
+                            <td id="tmplTitle" class="tmplTitle text-start">{{ album.title }}</td>
+                            <td id="tmplArtist" class="tmplArtist">{{ album.artist }}</td>
+                            <td id="tmplRelesasedAt" class="">{{ album.relesased_at | date:"SHORT_DATE_FORMAT" }}</td>
+                            <td id="tmplTracks" class="text-end">{{ album.tracks }}</td>
+                            <td id="tmplGenre" class="text-truncate">{{ album.genre }}</td>
+                            <td id="tmplType" class="text-truncate">{{ album.type }}</td>
+                            <td class="">
+                              <div class="d-grid gap-0">
+                                <button id="tmplEdit" data-bs-target="#tmplModal" type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal">
+                                  ✏️
+                                </button>
+                              </div>
+
+                              <!-- Modal -->
+                              <div id="tmplModal" class="modal fade" data-bs-backdrop="static" tabindex="-1" aria-labelledby="albumModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                  <div class="modal-content">
+                                    <div class="modal-header p-1">
+                                      <h1 class="modal-title fs-5 ms-1" id="modalLabel">Альбом #</h1>
+                                      <button type="button" class="btn-close me-0" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
-                                  </td>
-                                </tr>
+                                    <div class="modal-body">
+                                      <!-- Форма для редактирования альбома -->
+                                      <!-- метод загрузки формы 'update' из "urls.py" -->
+                                      <form class="needs-validation" action="{% url 'action' %}" method="post">
+                                        <!-- Говорим чтобы Django занялся безопасность запроса из формы (Cross Site Request Forgeries) -->
+                                        {% csrf_token %}
 
-                                <!-- Modal -->
-                                <div class="modal fade" id="modal-{{ album.id }}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                  <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                      <div class="modal-header p-1">
-                                        <h1 class="modal-title fs-5 ms-1" id="exampleModalLabel">Альбом #{{ album.id }}</h1>
-                                        <button type="button" class="btn-close me-0" data-bs-dismiss="modal" aria-label="Close"></button>
-                                      </div>
-                                      <div class="modal-body">
-                                        <!-- Форма для редактирования альбома -->
-                                        <!-- метод загрузки формы 'update' из "urls.py" -->
-                                        <form class="needs-validation" action="{% url 'action' %}" method="post">
-                                          <!-- Говорим чтобы Django занялся безопасность запроса из формы (Cross Site Request Forgeries) -->
-                                          {% csrf_token %}
+                                        <div class="row g-2">
 
-                                          <div class="row g-2">
-
-                                            <!-- ID альбома в базе данных -->
-                                            <div class="col-md-12 d-none">
-                                              <div class="input-group">
-                                                <span class="input-group-text">ID</span>
-                                                <input readonly required value="{{album.id}}" name="id" class="form-control" type="text" placeholder="ID альбома" aria-label="id input" />
-                                              </div>
-                                            </div>
-
-                                            <!-- название альбома -->
-                                            <div class="col-md-6">
-                                              <div class="input-group">
-                                                <span class="input-group-text">Название</span>
-                                                <input required value="{{album.title}}" name="title" class="form-control" type="text" placeholder="Название альбома" aria-label="title input" />
-                                              </div>
-                                            </div>
-
-                                            <!-- дата выпуска -->
-                                            <div class="col-md-6">
-                                              <div class="input-group">
-                                                <span class="input-group-text">Выпуск</span>
-                                                <input required value="{{album.relesased_at | date:"Y-m-d" }}" name="relesased_at" class="form-control" type="date" placeholder="Дата выпуска" aria-label="relesased_at input" />
-                                              </div>
-                                            </div>
-
-                                            <!-- артист -->
-                                            <div class="col-md-6">
-                                              <div class="input-group">
-                                                <span class="input-group-text">Артист</span>
-                                                <input name="artist" value="{{ album.artist }}" class="form-control" type="text" placeholder="Артист" aria-label="artist input" />
-                                              </div>
-                                            </div>
-
-                                            <!-- жанр -->
-                                            <div class="col-md-6">
-                                              <div class="input-group">
-                                                <span class="input-group-text">Жанр</span>
-                                                <input name="genre" value="{{ album.genre }}" class="form-control" type="text" placeholder="Жанр" aria-label="genre input" />
-                                              </div>
-                                            </div>
-
-                                            <!-- тип альбома -->
-                                            <div class="col-md-6">
-                                                <input name="type" value="{{album.type}}" class="form-control" list="typeOptions" id="typeDataList" placeholder="Тип альбома">
-                                                <datalist id="typeOptions">
-                                                  <option value="Демо">
-                                                  <option value="Дебютный">
-                                                  <option value="Промо">
-                                                  <option value="Саундтрек">
-                                                  <option value="Совместный">
-                                                  <option value="Сольный">
-                                                </datalist>
-                                            </div>
-
-                                            <!-- Число трэков в альбоме -->
-                                            <div class="col-md-6">
-                                              <div class="input-group">
-                                                <span class="input-group-text">Трэки</span>
-                                                <input name="tracks" value="{{album.tracks}}" class="form-control" type="number" placeholder="Трэки" aria-label="tracks input" />
-                                              </div>
-                                            </div>
-                                                
-                                            <!-- Кнопка для передачи данных из формы с типом удаление "delete" -->
-                                            <div class="col-md-6">
-                                              <div class="d-grid gap-2">
-                                                <button name="action" value="delete" type="submit" class="btn btn-danger" data-bs-dismiss="modal">🗑️ Удалить</button>
-                                              </div>
-                                            </div>
-                                                    
-                                            <!-- Кнопка для передачи данных из формы с типом сохранить "update"  -->
-                                            <div class="col-md-6">
-                                              <div class="d-grid gap-2">
-                                                <button name="action" value="update" type="submit" class="btn btn-primary" data-bs-dismiss="modal">📝 Сохранить</button>
-                                              </div>
+                                          <!-- ID альбома в базе данных -->
+                                          <div class="col-md-12 d-none">
+                                            <div class="input-group">
+                                              <span class="input-group-text">ID</span>
+                                              <input id="modalId" readonly required value="{{album.id}}" name="id" class="form-control" type="text" placeholder="ID альбома" aria-label="id input" />
                                             </div>
                                           </div>
-                                        </form>
-                                      </div>
+
+                                          <!-- название альбома -->
+                                          <div class="col-md-6">
+                                            <div class="input-group">
+                                              <span class="input-group-text">Название</span>
+                                              <input id="modalTitle" required value="{{album.title}}" name="title" class="form-control" type="text" placeholder="Название альбома" aria-label="title input" />
+                                            </div>
+                                          </div>
+
+                                          <!-- дата выпуска -->
+                                          <div class="col-md-6">
+                                            <div class="input-group">
+                                              <span class="input-group-text">Выпуск</span>
+                                              <input id="modalRelesasedAt" required value="{{album.relesased_at | date:"Y-m-d" }}" name="relesased_at" class="form-control" type="date" placeholder="Дата выпуска" aria-label="relesased_at input" />
+                                            </div>
+                                          </div>
+
+                                          <!-- артист -->
+                                          <div class="col-md-6">
+                                            <div class="input-group">
+                                              <span class="input-group-text">Артист</span>
+                                              <input id="modalArtist" name="artist" value="{{ album.artist }}" class="form-control" type="text" placeholder="Артист" aria-label="artist input" />
+                                            </div>
+                                          </div>
+
+                                          <!-- жанр -->
+                                          <div class="col-md-6">
+                                            <div class="input-group">
+                                              <span class="input-group-text">Жанр</span>
+                                              <input id="modalGenre" name="genre" value="{{ album.genre }}" class="form-control" type="text" placeholder="Жанр" aria-label="genre input" />
+                                            </div>
+                                          </div>
+
+                                          <!-- тип альбома -->
+                                          <div class="col-md-6">
+                                              <input id="modalType" name="type" value="{{album.type}}" class="form-control" list="typeOptions" id="typeDataList" placeholder="Тип альбома">
+                                              <datalist id="typeOptions">
+                                                <option value="Демо">
+                                                <option value="Дебютный">
+                                                <option value="Промо">
+                                                <option value="Саундтрек">
+                                                <option value="Совместный">
+                                                <option value="Сольный">
+                                              </datalist>
+                                          </div>
+
+                                          <!-- Число трэков в альбоме -->
+                                          <div class="col-md-6">
+                                            <div class="input-group">
+                                              <span class="input-group-text">Трэки</span>
+                                              <input id="modalTracks" name="tracks" value="{{album.tracks}}" class="form-control" type="number" placeholder="Трэки" aria-label="tracks input" />
+                                            </div>
+                                          </div>
+                                              
+                                          <!-- Кнопка для передачи данных из формы с типом удаление "delete" -->
+                                          <div class="col-md-6">
+                                            <div class="d-grid gap-2">
+                                              <button name="action" value="delete" type="submit" class="btn btn-danger" data-bs-dismiss="modal">🗑️ Удалить</button>
+                                            </div>
+                                          </div>
+                                                  
+                                          <!-- Кнопка для передачи данных из формы с типом сохранить "update"  -->
+                                          <div class="col-md-6">
+                                            <div class="d-grid gap-2">
+                                              <button name="action" value="update" type="submit" class="btn btn-primary" data-bs-dismiss="modal">📝 Сохранить</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </form>
                                     </div>
                                   </div>
                                 </div>
-                              {% endfor %}
-                            {% endif %}
-                          </tbody>
-                        </table>
+                              </div>
+                            </td>
+                          </tr>
+                        </template>
                       </div>
                     </div>
                   </div>

@@ -40,8 +40,6 @@ def index(request):
         "files": files,
         # интекс вкладки
         "tab_index": tab_index,
-        # все данные из базы данных
-        "albums": Album.objects.all(),
     }
     # ренедр вьюшки в html страницу
     return render(request, "index.html", context)
@@ -351,8 +349,9 @@ def json_albums(request):
         try:
             # вытаскиваем тело запроса и преобразуем его в json
             data = json.loads(request.body)
-            # достаем флаг fromDb(из БД) из json
-            from_db = data["fromDb"]
+            # достаем флаг fromDb(из БД) из json (по умолчанию False)
+            from_db = data.get("fromDb", False)
+
             # если получаем данные из БД
             if from_db:
                 # достааем все данные альбомов из БД
@@ -368,8 +367,8 @@ def json_albums(request):
             else:
                 # если получаем данные из файла
 
-                # достаем имя файла
-                filename = data["filename"]
+                # достаем имя файла (по умолчанию "")
+                filename = data.get("filename", "")
 
                 # если строка имени не пустое 
                 if not str.isspace(filename):
@@ -396,7 +395,7 @@ def json_albums(request):
             # ловим хоть одну ошибку
             # создаем объект словарь с ошибкой
             error = {
-                "messaage": f"{e}"
+                "messaage": f"error {e}"
             }
             # возвращаем ответ с ошибкой
             return HttpResponse(
@@ -411,6 +410,7 @@ def json_albums(request):
     json_data = json_str(  # метод обвертка
         list(all_albums.values()),  # данные для сериализации в JSON
     )
+
     # возвращаем ответ
     return HttpResponse(
         json_data, # даннве ответа
