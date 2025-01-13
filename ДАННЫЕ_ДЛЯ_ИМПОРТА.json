@@ -1,0 +1,18 @@
+[
+    {
+        "title": "Queen",
+        "relesased_at": "1973-07-13",
+        "tracks": 10,
+        "artist": "Queen",
+        "genre": "Hard rock",
+        "type": "Дебютный"
+    },
+    {
+        "title": "test",
+        "relesased_at": "2024-12-11",
+        "tracks": 1,
+        "artist": "test",
+        "genre": "test",
+        "type": "Промо"
+    }
+]
